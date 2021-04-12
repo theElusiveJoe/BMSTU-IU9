@@ -1,117 +1,128 @@
 package main
 
-import "fmt"
-import "sort"
+import (
+	"fmt"
+)
 
 var nodes [][]int
-var colors []int
+var variantsOfGroup [][]int
+var g1 []int
+var g2 []int
+var n int
 
-func cmpColor(i, col int) bool {// здесь col - цвет узла с номером i
-	ans := true
-	fmt.Println("node ", i)
-	if colors[i] == 0 { // если узел еще не покрашен, красим
-		colors[i] = col
-		fmt.Println("coloring node ", i, "in", col)
-	} else if colors[i] != col { // если ожидаемый цвет не совпадает с действительным
-		fmt.Println("wrong color!")
-		return false
+func makeVariants(groupNums []int, a, b, c, manNum int) {
+	// a,b,c - счетчики того, сколько в человек могут входить в любую, только в первую, точлько во вторую группы
+	if manNum == n {
+		variantsOfGroup = append(variantsOfGroup, groupNums)
+		g1 = append(g1, a)
+		g2 = append(g2, b)
+		return
 	}
-	fmt.Println()
-	for _, x := range nodes[i] { // проверяем интендентные узлы
-		if colors[x] == 0 { // если идет до некрешенного узла, то переходим в него
-			fmt.Print(i, "-->")
-			ans = ans && cmpColor(x, 3-col)
-		} else if colors[x] == col { // если интендентный узел имеет тот же цвет
-			fmt.Println("nodes conflict:", i, "and", x)
-			return false
+
+	var i int
+	for i = 0; i < n; i++ { // находим такой минимальный i, что manNum и i не совместимы
+		if nodes[manNum][i] == 1 {
+			break
 		}
 	}
+	if i == n { // если совместим со всеми 
+		groupNums[manNum] = 0
+		makeVariants(groupNums, a+1, b, c, manNum+1)
+	} else {
+		//создаем 2 последуюущих варианта
+		group1 := make([]int, 0)
+		group2 := make([]int, 0)
+		for _, x := range groupNums {
+			group1, group2 = append(group1, x), append(group2, x)
+		}
+		// они отличаются тем, что в одном из них manNum включен в первую групп, а в другом - во вторую
+		group1[manNum], group2[manNum] = 1, 2
+		f1, f2 := true, true
 
-	return ans
+		for ; i < n && (f1 || f2); i++ {
+			// в этом цикле добавляем в group1 и group2 те, которые можем
+			// до тех пор, пока не встретим тот, который нельзя добавить
+			if nodes[manNum][i] == 1 { // если i и manNum несовместимы
+				if groupNums[i] == 0 { // если iй еще не распределили, то записываем в обе
+					group1[i] = 2
+					group2[i] = 1
+				}
+				if groupNums[i] == 1 { // если в первой группе
+					f1 = false
+				}
+				if groupNums[i] == 2 { // если во второй группе
+					f2 = false
+				}
+			}
+		}
+
+		if f1 {
+			makeVariants(group1, a, b+1, c, manNum+1)
+		}
+		if f2 {
+			makeVariants(group2, a, b, c+1, manNum+1)
+		}
+	}
 }
 
 func main() {
-	var n int
 	fmt.Scan(&n)
-
-	nodes = make([][]int, n) // список несовместимых
+	nodes = make([][]int, n)
+	base := make([]int, n) // список кто-где
 	var str string
 	for i := 0; i < n; i++ {
 		nodes[i] = make([]int, 0)
 		for j := 0; j < n; j++ {
 			fmt.Scan(&str)
 			if str == "+" {
-				nodes[i] = append(nodes[i], j)
+				nodes[i] = append(nodes[i], 1)
+			} else {
+				nodes[i] = append(nodes[i], 0)
 			}
 		}
 	}
 
-	for i := 0; i < n; i++ {
-		fmt.Print(i, ":")
-		fmt.Println(nodes[i])
-	}
+	makeVariants(base, 0, 0, 0, 0)
 
-	colors = make([]int, n)
-	for i, node := range nodes {
-		if len(node) != 0 && colors[i] == 0 && !cmpColor(i, 1) {
-			fmt.Println("No solution")
-			return
-		}
-	}
-
-	//fmt.Println(colors, " - colors")
-
-	whites := make([]int, 0)
-	blues := make([]int, 0)
-	reds := make([]int, 0)
-	for i := 0; i < n; i++ {
-		if colors[i] == 0 {
-			whites = append(whites, i+1)
-		} else if colors[i] == 1 {
-			blues = append(blues, i+1)
-		} else {
-			reds = append(reds, i+1)
-		}
-	}
-
-	fmt.Println(whites, " - whites")
-	fmt.Println(blues, " - blues")
-	fmt.Println(reds, " - reds")
-
-	for i := 0; len(blues) < n/2 && i < n; i++ {
-		blues = append(blues, whites[i])
-	}
-	for i := 0; len(reds) < n/2 && i < n; i++ {
-		reds = append(reds, whites[i])
-	}
-
-	sort.Ints(blues)
-	sort.Ints(reds)
-	i, j := 0, 0
-	for i < len(blues) && j < len(reds) {
-		if blues[i] < reds[j] {
-			for _, x := range blues {
-				fmt.Print(x, " ")
-			}
-			return
-		} else if blues[i] > reds[j] {
-			for _, x := range reds {
-				fmt.Print(x, " ")
-			}
-			return
-		}
-		i++
-		j++
-	}
-
-	if i == len(blues) {
-		for _, x := range blues {
-			fmt.Print(x, " ")
-		}
+	if len(variantsOfGroup) == 0 {
+		// если мы ни разу не дошли до конца, значит не смогли распределить на 2 группы
+		// значит нет решения
+		fmt.Printf("No solution")
 	} else {
-		for _, x := range reds {
-			fmt.Print(x, " ")
+		for i, _ := range variantsOfGroup{
+			g1[i] = n/2 - g2[i]
+		}
+		variants := make([][]int, len(variantsOfGroup))
+		for i := 0; i < n; i++ { // рассматриваем конкретного человека
+			for j, x := range variantsOfGroup{ // смотрим его принадлежность в разных вариантах групп
+				if x[i] == 0 && g1[j] > 0 {
+					x[i] = 1
+					g1[j]--
+				}
+				if x[i] == 0 && g1[j] == 0 {
+					x[i] = 2
+				}
+				variants[j] = append(variants[j], x[i])
+			}
+		}
+		ans := variants[0]
+		for _, x := range variantsOfGroup {
+			if len(x) <= len(ans) {
+				for i, _ := range x {
+					if ans[i] > x[i] {
+						copy(ans, x)
+						break
+					} else if ans[i] < x[i] {
+						break
+					}
+				}
+			}
+		}
+
+		for i, x := range ans {
+			if x == 1 {
+				fmt.Print(i+1, " ")
+			}
 		}
 	}
-
 }

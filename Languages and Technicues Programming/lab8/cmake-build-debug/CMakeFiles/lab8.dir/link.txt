@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/lab8.dir/main.cpp.o CMakeFiles/lab8.dir/FenwickTree.cpp.o CMakeFiles/lab8.dir/Integer.cpp.o  -o lab8 

@@ -1,0 +1,3 @@
+/home/fsociety/Study/Programming/Languages and Technicues Programming/lab8/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/fsociety/Study/Programming/Languages and Technicues Programming/lab8/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/fsociety/Study/Programming/Languages and Technicues Programming/lab8/cmake-build-debug/CMakeFiles/lab8.dir

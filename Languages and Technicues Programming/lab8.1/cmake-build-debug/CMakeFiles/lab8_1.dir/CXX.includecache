@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/sempai/Study/Programming/Languages and Technicues Programming/lab8.1/FenwickTree.cpp
+FenwickTree.h
+/home/sempai/Study/Programming/Languages and Technicues Programming/lab8.1/FenwickTree.h
+
+/home/sempai/Study/Programming/Languages and Technicues Programming/lab8.1/FenwickTree.h
+vector
+-
+
+/home/sempai/Study/Programming/Languages and Technicues Programming/lab8.1/main.cpp
+iostream
+-
+FenwickTree.cpp
+/home/sempai/Study/Programming/Languages and Technicues Programming/lab8.1/FenwickTree.cpp
+

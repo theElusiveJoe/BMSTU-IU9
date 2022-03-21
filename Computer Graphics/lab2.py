@@ -139,12 +139,11 @@ def cube_default(x_shift=4):
 
 
 def cube():
-    global angle1, angle2, angle3
+    global angle1, angle2, angle3, m
 
     glPushMatrix()
 
     glScalef(msh, msh, msh)
-    glScalef(1, 0.5, 1)
     glRotatef(angle1, 0, 0, 1)
     glRotatef(angle2, 0, 1, 0)
     glRotatef(angle3, 1, 0, 0)

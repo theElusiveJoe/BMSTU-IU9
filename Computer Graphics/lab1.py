@@ -255,7 +255,6 @@ def display_growing_poly():
     glLoadIdentity()
     glClearColor(0, 0, 0, 1.0)
     glPushMatrix()
-    glRotatef(angle, 0, 0, 1)
     glBegin(GL_POLYGON)
     
     # for i, v in enumerate(vertexes):
@@ -277,6 +276,7 @@ def display_growing_poly():
     glVertex2f(0,0)
 
     glEnd()
+    glRotatef(angle, 0, 0, 1)
     glPopMatrix()
     angle += delta
     glfw.swap_buffers(window)
@@ -306,6 +306,6 @@ def display():
     glfw.poll_events()
 
 
-display = draw_dots2
-gen_dots()
+display = display_growing_poly()
+gen_poly(15)
 main()

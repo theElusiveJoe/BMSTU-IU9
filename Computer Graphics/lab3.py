@@ -15,6 +15,7 @@ circles = []
 
 angle1, angle2, angle3 = 0, 0, 0
 
+
 def main():
     global window
 
@@ -54,75 +55,23 @@ def key_callback(window, key, scancode, action, mods):
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         if key == glfw.KEY_C:
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    
 
-
-# def cube():
-#     global angle
-
-#     glPushMatrix()
-
-#     glScalef(msh, msh, msh)
-#     glScalef(1, 0.5, 1)
-#     glRotatef(angle, 0, 0, 1)
-#     glMultMatrixd(m)
-#     # angle += delta
-
-#     glBegin(GL_QUADS)
-#     for x, surface in enumerate(surfaces):
-#         glColor3fv(colors[x])
-#         for i, vertex in enumerate(surface):
-#             glVertex3fv(verticies[vertex])
-
-#     glEnd()
-
-#     glBegin(GL_LINES)
-#     for edge in edges:
-#         for vertex in edge:
-#             glColor3fv((1.0, 0.0, 0.0))
-#             glVertex3fv(verticies[vertex])
-
-#     glEnd()
-#     glPopMatrix()
 
 def gen_sphere():
     global points, ppl, circles
     r = 1
 
-    d_fi = np.linspace(0, 2*math.pi, 50)
-    d_fi = np.linspace(0, 2*math.pi, 50)
-    # d_tao = np.linspace(-math.pi/2, math.pi/2, 50) 
-
-    # points = []
     circles = []
-    for fi in np.linspace(0, 2*math.pi, 10):
+    # полуокружность
+    circle = np.array([[math.sin(tao), math.cos(tao), 0]
+                       for tao in np.linspace(0, math.pi, 30)])
+    for fi in np.linspace(0, 2*math.pi, 30):
+        # матрица поворота
         turn = np.array([np.cos(fi), 0, np.sin(fi),
-                        0,1,0,
-                        -np.sin(fi), 0, np.cos(fi)]).reshape(3,3)
-        print(turn, turn.shape)
-        circle = np.array([[math.cos(tao),math.sin(tao),0] for tao in np.linspace(0, 2*math.pi, 2202020202mmm020)])
-        print(circle, circle.shape)
+                        0, 1, 0,
+                        -np.sin(fi), 0, np.cos(fi)]).reshape(3, 3)
         circles.append(np.matmul(turn, circle.T).T.round(3))
-    
-    # circles = circles.around(3)
-    print(circles[:2])
-    # for fi in np.linspace(0, 2*math.pi, 50):
-    #     for tao in np.linspace(-math.pi/2, math.pi/2, 50):
-    #         points.append((r*math.cos(tao)*math.cos(fi), 
-    #                 r*math.cos(tao)*math.sin(fi), 
-    #                 r*math.sin(tao)))
 
-    # ppl = 100 # polygons per level
-    # # print('arange:', np.linspace(-0.
-    # # 5,0.5,30))
-    # delta = 0
-    # for z in np.linspace(-1,1,30):
-    #     points.append([])
-    #     r = 1-z*z
-    #     delta = 0 if delta > 0 else 0.1
-    #     for fi in np.linspace(0+delta, 2*math.pi+delta, ppl):
-    #         points[-1].append((r*math.cos(fi), r*math.sin(fi), z))
-    # print(points[:5])
 
 def sphere():
     global circles
@@ -131,62 +80,36 @@ def sphere():
     glRotatef(angle2, 0, 1, 0)
     glRotatef(angle3, 1, 0, 0)
 
-    # glScalef(msh, msh, msh)
-    # glScalef(1, 0.5, 1)
-    # glRotatef(90, 1, 0, 0)
-    # glMultMatrixd(m)
-    # angle += delta
     glBegin(GL_QUADS)
-    glColor3f(1,1,1)
     for circle_i, circle in enumerate(circles[:-1]):
-        for point_i, point in enumerate(circle):
-            # print(*(circles[circle_i][point_i]))
+        for point_i, point in enumerate(circle[:-1]):
+            if circle_i % 2 == 0:
+                glColor3f(1, 0, 0)
+            else:
+                glColor3f(0, 1, 0)
             glVertex3f(*(circles[circle_i][point_i]))
-            glVertex3f(*(circles[circle_i][(point_i+1)%len(circle)]))
-            glVertex3f(*(circles[(circle_i+1)%len(circle)][point_i]))
-            glVertex3f(*(circles[(circle_i+1)%len(circle)][(point_i+1)%len(circle)]))
-    # for ilvl, lvl in enumerate(points[:-1]):
-    #     # glColor3fv(colors[x])
-    #     for i, point in enumerate(lvl):
-    #         # print(point[0], point[1], point[2])
-    #         a = point
-    #         b = (points[(ilvl+1)%len(points)][i])
-    #         c = (lvl[(i+1)%len(lvl)])
-    #         print(a, *a)
-    #         glVertex3f(*a)
-    #         glVertex3f(*b)
-    #         glVertex3f(*b)
-    #         glVertex3f(*c)
-    #         glVertex3f(*c)
-    #         glVertex3f(*a)
-            # glVertex3f(*point)
-            # glVertex3f(*(points[(ilvl+1)%len(points)][i]))
-            # glVertex3f(*(lvl[(i+1)%len(lvl)]))
-    # for ilvl, lvl in enumerate(reversed(points[1:])):
-    #     # glColor3fv(colors[x])
-    #     for i, point in enumerate(lvl):
-    #         # print(point[0], point[1], point[2])
-    #         a = point
-    #         b = (points[(ilvl+1)%len(points)][i])
-    #         c = (lvl[(i+1)%len(lvl)])
-    #         print(a, *a)
-    #         glVertex3f(*a)
-    #         glVertex3f(*b)
-    #         glVertex3f(*b)
-    #         glVertex3f(*c)
-    #         glVertex3f(*c)
-    #         glVertex3f(*a)
+            glVertex3f(*(circles[circle_i][(point_i+1) % len(circle)]))
+            glVertex3f(*(circles[(circle_i+1) % len(circle)]
+                       [(point_i+1) % len(circle)]))
+            glVertex3f(*(circles[(circle_i+1) % len(circle)][point_i]))
     glEnd()
 
-
-    # glBegin(GL_LINES)
-    # for edge in edges:
-    #     for vertex in edge:
-    #         glColor3fv((1.0, 0.0, 0.0))
-    #         glVertex3fv(verticies[vertex])
-
+    glBegin(GL_LINES)
+    glColor3f(1, 1, 1)
+    for circle_i, circle in enumerate(circles[:-1]):
+        for point_i, point in enumerate(circle[:]):
+            glVertex3f(*(circles[circle_i][point_i]))
+            glVertex3f(*(circles[circle_i][(point_i+1) % len(circle)]))
+            glVertex3f(*(circles[circle_i][(point_i+1) % len(circle)]))
+            glVertex3f(*(circles[(circle_i+1) % len(circle)]
+                       [(point_i+1) % len(circle)]))
+            glVertex3f(*(circles[(circle_i+1) % len(circle)]
+                       [(point_i+1) % len(circle)]))
+            glVertex3f(*(circles[(circle_i+1) % len(circle)][point_i]))
+            glVertex3f(*(circles[circle_i][point_i]))
+            glVertex3f(*(circles[(circle_i+1) % len(circle)][point_i]))
+    glEnd()
     glPopMatrix()
-
 
 
 def display():
@@ -200,6 +123,7 @@ def display():
 
     glfw.swap_buffers(window)
     glfw.poll_events()
+
 
 gen_sphere()
 main()

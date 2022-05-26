@@ -7,7 +7,6 @@ from scipy.spatial.transform import Rotation as R
 
 window = None
 
-
 surfaces = None
 
 def_verticies = None
@@ -19,8 +18,6 @@ flag_spin = True
 flag_textured = True
 flag_move = True
 flag_ranom = False
-
-# настройки
 
 sphere_cut_a = 10
 sphere_cut_b = 10
@@ -69,7 +66,7 @@ def cmp_surfaces(s1):
     return min(list([cur_verticies[v][0] ** 2 + cur_verticies[v][1] ** 2 + (cur_verticies[v][2] - 10) ** 2 for v in s1]))
 
 
-def draw_cube():
+def draw_sphere():
     global turn, cur_verticies, cur_pos, move_direction
 
     glPushMatrix()
@@ -80,7 +77,7 @@ def draw_cube():
     # поворачиваем сферу
     if flag_spin:
         turn += 0.05
-        cur_verticies = turn_cube(turn)
+        cur_verticies = turn_sphere(turn)
 
     # придаем движение
     if flag_move :
@@ -124,10 +121,11 @@ def draw_cube():
     glPopMatrix()
 
 
-def turn_cube(fi):
+def turn_sphere(fi):
     r1 = R.from_rotvec([0,fi,0])
     r2 = R.from_rotvec([0.3,0,0])
     return np.matmul(np.matmul(def_verticies, r1.as_matrix()), r2.as_matrix())
+
 
 def gen_sphere():
     global def_verticies, surfaces
@@ -165,12 +163,6 @@ def display():
     glLightfv(GL_LIGHT0, GL_SPECULAR, [0, 0, 0,0])
     glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
 
-    # первый светит белым направленным
-    # glEnable(GL_LIGHT1)
-    # glLightfv(GL_LIGHT1, GL_POSITION, [0,10,0.1,1])
-    # glLightfv(GL_LIGHT1, GL_DIFFUSE, [0, 0, 0, 0])
-    # glLightfv(GL_LIGHT1, GL_SPECULAR, [1, 1, 1, 1])
-
     # параметры глобальной модели
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.7,0.7,0.7,0])
     glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, [1,0,0])
@@ -181,7 +173,7 @@ def display():
     glLoadIdentity()
     glClearColor(0.0, 0.0, 0.0, 0.0)
 
-    draw_cube()
+    draw_sphere()
 
     glfw.swap_buffers(window)
     glfw.poll_events()
@@ -196,6 +188,4 @@ def gen_diffuse(surface):
 
 
 gen_sphere()
-print(surfaces)
-print(def_verticies)
 main()

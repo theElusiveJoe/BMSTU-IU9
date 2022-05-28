@@ -1,16 +1,15 @@
+# govnokod by E-Matveev©
 import random
-
+import time
 from OpenGL.GL import *
 import glfw
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
+
 window = None
 
-surfaces = None
-
-def_verticies = None
-cur_verticies = None
+quad_strip_levels = None
 
 turn = 0
 
@@ -22,62 +21,24 @@ flag_ranom = False
 sphere_cut_a = 10
 sphere_cut_b = 10
 cur_pos = np.array([0.5, 0.5, 0.5])
-move_direction = [-0.4, 1, 1] / np.linalg.norm([-0.4, 1, 1])
+move_direction = [-0.4, 0.5, 0.7] / np.linalg.norm([1, -1, 0.7])
 
-
-def set_light():
-    glEnable(GL_LIGHTING)
-    # нулевой светит белым диффузным
-    glEnable(GL_LIGHT0)
-    glLightfv(GL_LIGHT0, GL_POSITION, [1, 1, 0, 1])
-    glLightfv(GL_LIGHT0, GL_SPECULAR, [0, 0, 0, 0])
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
-
-    # параметры глобальной модели
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.7, 0.7, 0.7, 1])
-    glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, [1, 0, 0])
-    glLightModelfv(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR)
-    glLightModelfv(GL_LIGHT_MODEL_TWO_SIDE, 0)
-
-
-def key_callback(window, key, scancode, action, mods):
-    global flag_spin, flag_textured, flag_ranom, flag_move
-    if action == glfw.PRESS:
-        if key == glfw.KEY_S:
-            flag_spin = not flag_spin
-        elif key == glfw.KEY_T:
-            flag_textured = not flag_textured
-        elif key == glfw.KEY_M:
-            flag_move = not flag_move
-        elif key == glfw.KEY_R:
-            flag_random = not flag_ranom
-        elif key == glfw.KEY_Z:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        elif key == glfw.KEY_C:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+start = 0
 
 
 def cmp_surfaces(s1):
-    return min(list([def_verticies[v][0] ** 2 + def_verticies[v][1] ** 2 + (def_verticies[v][2] - 10) ** 2 for v in s1]))
-
-
-def gen_diffuse(surface):
-    x, y, z = def_verticies[surface[0]]
-    red = z/2+0.5
-    green = x/2+0.5
-    blue = y/2+0.5
-    return [red, green, blue, np.sqrt(x**2+y**2)]
+    return min(list([quad_strip_levels[v][0] ** 2 + quad_strip_levels[v][1] ** 2 + (quad_strip_levels[v][2] - 10) ** 2 for v in s1]))
 
 
 def turn_sphere(fi):
     r1 = R.from_rotvec([0, fi, 0])
     r2 = R.from_rotvec([0.3, 0, 0])
-    return np.matmul(np.matmul(def_verticies, r1.as_matrix()), r2.as_matrix())
+    return np.matmul(np.matmul(quad_strip_levels, r1.as_matrix()), r2.as_matrix())
 
 
 #MAIN
 def main():
-    global window
+    global window, start
 
     if not glfw.init():
         return
@@ -88,25 +49,16 @@ def main():
         return
 
     glfw.make_context_current(window)
-    glfw.set_key_callback(window, key_callback)
 
-    # init_display_lists()
-    glEnable(GL_LIGHTING)
-    # нулевой светит белым диффузным
-    glEnable(GL_LIGHT0)
-    glLightfv(GL_LIGHT0, GL_POSITION, [1, 1, 0, 1])
-    glLightfv(GL_LIGHT0, GL_SPECULAR, [0, 0, 0, 0])
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
-
-    # параметры глобальной модели
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.7, 0.7, 0.7, 1])
-    glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, [1, 0, 0])
-    glLightModelfv(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR)
-    glLightModelfv(GL_LIGHT_MODEL_TWO_SIDE, 0)
+    init_display_list_2()
+    glCallList(2)
 
     glEnableClientState(GL_VERTEX_ARRAY)
-
-    while not glfw.window_should_close(window):
+    init_display_list_1()
+    
+    start = time.monotonic()
+    for _ in range(200):
+    # while not glfw.window_should_close(window):
         display()
 
     glfw.destroy_window(window)
@@ -119,19 +71,10 @@ def display():
     glLoadIdentity()
     glClearColor(0.0, 0.0, 0.0, 0.0)
 
-    glVertexPointer(3, GL_FLOAT, 0, def_verticies)
-    init_display_lists()
-
-    # тест vertexlist
-    # glVertexPointer(2, GL_FLOAT, 0, [0,0,0,1,1,10,1,0])
-    # glPushMatrix()
-    # glEnableClientState(GL_VERTEX_ARRAY)
-    # glDrawArrays(GL_QUADS, 0, 4)
-    # glPopMatrix()
-
     # масштабируем для нашлядности
     glScalef(0.2, 0.2, 0.2)
 
+    # тут считаем движение и вызываем дисплейный список
     draw_sphere()
 
     glfw.swap_buffers(window)
@@ -147,7 +90,6 @@ def draw_sphere():
     # придаем движение
     if flag_move:
         cur_pos += move_direction/10
-        # print(cur_pos, move_direction)
         if cur_pos[0]**2 + cur_pos[1]**2 + cur_pos[2]**2 >= 10:
             b = cur_pos
             a = cur_pos-move_direction
@@ -156,10 +98,7 @@ def draw_sphere():
             len_t = np.linalg.norm(move_direction) * np.cos(fi)
             d = cur_pos - t_vec*len_t
             move_direction = a - b + 2*(d-a)
-            # if flag_ranom:
-            # move_direction += np.array([random.uniform(0, 0.05) for _ in range(3)])
             move_direction = move_direction / np.linalg.norm(move_direction)
-
 
     # двигаем
     glTranslatef(*cur_pos)
@@ -172,74 +111,50 @@ def draw_sphere():
 
 #GEN
 def gen_sphere():
-    global def_verticies, surfaces
-    r = 1
+    global quad_strip_levels, def_colors
 
-    def_verticies = []
 
-    # полуокружность
-    circle = np.array([[np.sin(tao), np.cos(tao), 0]
-                       for tao in np.linspace(0, np.pi, sphere_cut_a)])
-    for fi in np.linspace(0, 2 * np.pi, sphere_cut_b):
+    half_circle = np.array([[np.sin(tao), np.cos(tao), 0]
+                           for tao in np.linspace(0, np.pi, sphere_cut_a)])
+
+    half_circles = [] # список списков точек на полуокружностях без повторений
+    for fi in np.linspace(0, 2 * np.pi, sphere_cut_b, endpoint=False):
         # матрица поворота
-        turn = np.array([np.cos(fi), 0, np.sin(fi),
-                         0, 1, 0,
-                         -np.sin(fi), 0, np.cos(fi)]).reshape(3, 3)
-        def_verticies.extend((np.matmul(turn, circle.T).T.round(5).tolist()))
-
-    print(np.linspace(0, 2 * np.pi, sphere_cut_b))
-
-    surfaces = []
-    for circle_i in range(sphere_cut_a-1):
-        for point_i in range(sphere_cut_b-1):
-            surfaces.append([
-                sphere_cut_a*circle_i + point_i,
-                sphere_cut_a*circle_i + ((point_i+1) % len(circle)),
-                sphere_cut_a*((circle_i+1) % len(circle)) +
-                ((point_i+1) % len(circle)),
-                sphere_cut_a*((circle_i+1) % len(circle)) + point_i
-            ])
-
-    newarr = []
-    for x, surface in enumerate(sorted(surfaces, key=lambda x: cmp_surfaces(x))):
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, [1, 0, 0] + [1])
-        # print('ADDING POLYGON #', x)
-        if flag_textured:
-            glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gen_diffuse(surface))
-        for i, vertex in enumerate(surface):
-            v = list(def_verticies[vertex])
-            for x in v:
-                # print('appending', x)
-                newarr.append(x)
+        rot_mat = R.from_rotvec([0,fi,0]).as_matrix()
+        half_circles.append( np.matmul(rot_mat, half_circle.T).T.tolist())
     
-    def_verticies = newarr
+    quad_strip_levels = [[] for _ in range(sphere_cut_a-1)]
+    for i, half_circle in enumerate(half_circles):
+        for qs_level, top_left in enumerate(half_circle[:-1]):
+            quad_strip_levels[qs_level].append(top_left)
+            quad_strip_levels[qs_level].append(half_circle[qs_level+1])
 
-
+    for i, qs_level in enumerate(quad_strip_levels):
+        quad_strip_levels[i] = qs_level + qs_level[:2] 
+    
 #INIT_LISTS
-def init_display_lists():
-    global turn, cur_verticies, cur_pos, move_direction
+def init_display_list_1():
     glNewList(1, GL_COMPILE)
 
     # рисуем
-    if not flag_textured:
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, [0, 0, 0, 0])
-
-    # glBegin(GL_QUADS)
-    # for x, surface in  enumerate(sorted(surfaces, key = lambda x: cmp_surfaces(x))):
-    #     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, [1,0,0] + [1])
-    #     if flag_textured : glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gen_diffuse(surface))
-    #     for i, vertex in enumerate(surface):
-    #         v = list(def_verticies[vertex])
-    #         glVertex3fv(v)
-    # glEnd()
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [1, 0, 1, 1])
     
-    glDrawArrays(GL_QUADS, 0, len(def_verticies))
+
+    for qs in quad_strip_levels:
+         # добавляем в список вершин то, что нагенерировали
+        glVertexPointer(3, GL_FLOAT, 0, qs)
+        glDrawArrays(GL_QUAD_STRIP, 0, len(qs))
 
     glEndList()
 
+
+def init_display_list_2():
     # список для света
     glNewList(2, GL_COMPILE)
     glEnable(GL_LIGHTING)
+
+    glDisable(GL_NORMALIZE)
+
     # нулевой светит белым диффузным
     glEnable(GL_LIGHT0)
     glLightfv(GL_LIGHT0, GL_POSITION, [1, 1, 0, 1])
@@ -254,5 +169,7 @@ def init_display_lists():
 
 
 gen_sphere()
-init_display_lists()
+start = time.monotonic()
 main()
+stop = time.monotonic()
+print('fast:', stop-start)

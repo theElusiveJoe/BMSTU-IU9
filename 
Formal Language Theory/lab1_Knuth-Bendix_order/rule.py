@@ -1,4 +1,3 @@
-
 class Rule():
     def __init__(self, term_left, term_right):
         self.left = term_left

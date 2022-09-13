@@ -6,4 +6,4 @@ variables = x, a, b, y
 
 (f(g(x)) ::= g(h(x, x)))
 (g(f(x)) ::= h(g(x), x))
-(k(f(y)) ::= k(f(f(y)))) 
+(k(f(y)) ::= k(f(f(y)))) w

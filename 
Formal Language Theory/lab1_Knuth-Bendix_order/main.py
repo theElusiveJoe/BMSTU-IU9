@@ -1,11 +1,10 @@
 from parser import Parser
 from checker import Checker
-
-from subprocess import Popen, PIPE, STDOUT, run
+import sys
 
 
 if __name__ == '__main__':
     p = Parser()
-    p.parse_file('tests/test3.txt')
+    p.parse_file(sys.argv[1])
     ch = Checker(p)
     ch.start_checking()

@@ -1,6 +1,3 @@
-import re
-
-
 class Term():
     def __init__(self, term_type=None, content=None, name=None):
         """

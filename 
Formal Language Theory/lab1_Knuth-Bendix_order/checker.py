@@ -61,12 +61,11 @@ class Checker():
             self.write_kb_to_graph(f'KB1 drop {rule}', oldo, oldr, O, R)
             self.check_state(O, R)
             return True
-        
+
     def check_kb_2(self, rule, O, R, oldo, oldr):
         # print('KB2', rule)
         oldo, oldr = deepcopy(oldo), deepcopy(oldr)
         O, R = deepcopy(O), deepcopy(R)
-
 
         left, right = rule.left, rule.right
         if left.type == right.type == 'constructor':
@@ -124,6 +123,8 @@ class Checker():
 
         for l, r in list(zip(left.content, right.content))[::self.order_param]:
             if l != r:
+                print('n-ка (t1 , . . . , tn ) лексикографически больше, чем (u1 , . . . , un )')
+                print('in KB4 first mismatch:', l, 'and', r, '\n')
                 R.add(Rule(l, r))
                 new_rules = R.difference(oldr)
                 self.write_kb_to_graph(
@@ -132,7 +133,7 @@ class Checker():
                 return
 
     def chech_cycles(self, O):
-        O = deepcopy(O)        
+        O = deepcopy(O)
         g = {}
         while(O):
             s, d = O.pop()
@@ -204,12 +205,12 @@ class Checker():
                     print(f'    lg: {order[0]} > {order[1]}')
                     res_file.write(f'    lg: {order[0]} > {order[1]}{nl}')
                 print('***********************')
-                raise Decision # прекращаем поиск решения, сбрасываем стек вызова до start_checking()
+                raise Decision  # прекращаем поиск решения, сбрасываем стек вызова до start_checking()
                 return
 
         O = set(filter(lambda ord: ord[0] != ord[1], O))
         if self.chech_cycles(O):
-            return 
+            return
 
         # берем какое-нибудь правило переписывания
         rule = R.pop()

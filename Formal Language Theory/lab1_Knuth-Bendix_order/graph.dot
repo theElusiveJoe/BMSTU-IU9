@@ -1,0 +1,94 @@
+digraph G { node [shape = box]
+"START" -> "Order:
+ 
+ Rules:
+f(g(x),g(y)) -> f(x,y)"[label = go];
+"Order:
+ 
+ Rules:
+f(g(x),g(y)) -> f(x,y)" -> "Order:
+ 
+ Rules:
+g(x) -> f(x,y)"[label = "KB2 suppose  g(x) -> f(x,y)"];
+"Order:
+ 
+ Rules:
+g(x) -> f(x,y)" -> "Order:
+ 
+ Rules:
+x -> f(x,y)"[label = "KB2 suppose  x -> f(x,y)"];
+"Order:
+ 
+ Rules:
+g(x) -> f(x,y)" -> "Order:
+g > f 
+ Rules:
+g(x) -> x
+g(x) -> y"[label = "KB3 suppose 
+g > f"];
+"Order:
+g > f 
+ Rules:
+g(x) -> x
+g(x) -> y" -> "Order:
+g > f 
+ Rules:
+g(x) -> y"[label = "KB1 drop g(x) -> x"];
+"Order:
+ 
+ Rules:
+f(g(x),g(y)) -> f(x,y)" -> "Order:
+ 
+ Rules:
+g(y) -> f(x,y)"[label = "KB2 suppose  g(x) -> f(x,y) g(y) -> f(x,y)"];
+"Order:
+ 
+ Rules:
+g(y) -> f(x,y)" -> "Order:
+ 
+ Rules:
+y -> f(x,y)"[label = "KB2 suppose  y -> f(x,y)"];
+"Order:
+ 
+ Rules:
+g(y) -> f(x,y)" -> "Order:
+g > f 
+ Rules:
+g(y) -> x
+g(y) -> y"[label = "KB3 suppose 
+g > f"];
+"Order:
+ 
+ Rules:
+f(g(x),g(y)) -> f(x,y)" -> "Order:
+ 
+ Rules:
+f(g(x),g(y)) -> x
+f(g(x),g(y)) -> y
+g(y) -> y"[label = "{'KB4 new:\n(f(g(x),g(y)) -> x\nf(g(x),g(y)) -> y\ng(y) -> y)'}"];
+"Order:
+ 
+ Rules:
+f(g(x),g(y)) -> x
+f(g(x),g(y)) -> y
+g(y) -> y" -> "Order:
+ 
+ Rules:
+f(g(x),g(y)) -> y
+g(y) -> y"[label = "KB1 drop f(g(x),g(y)) -> x"];
+"Order:
+ 
+ Rules:
+f(g(x),g(y)) -> y
+g(y) -> y" -> "Order:
+ 
+ Rules:
+g(y) -> y"[label = "KB1 drop f(g(x),g(y)) -> y"];
+node [color = lightgreen, style = filled];"Order:
+ 
+ Rules:
+g(y) -> y" -> "Order:
+ 
+ Rules:
+"[label = "KB1 drop g(y) -> y"];
+}

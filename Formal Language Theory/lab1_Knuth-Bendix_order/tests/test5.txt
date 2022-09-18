@@ -1,0 +1,9 @@
+lexicographic
+
+constructors = f(1),g(1),h(1)
+
+variables = x, y
+
+(f(x) ::= g(x))
+(g(x) ::= h(x))
+(h(x) ::= f(x))

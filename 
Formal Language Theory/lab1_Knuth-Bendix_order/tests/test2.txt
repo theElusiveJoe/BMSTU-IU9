@@ -1,8 +1,0 @@
-lexicographic
-
-constructors = f(1),g(1),h(2),k(1)
-
-variables = x, a, b, y
-
-(f(g(x)) ::= g(h(x, x)))
-(g(f(x)) ::= h(g(x), x))

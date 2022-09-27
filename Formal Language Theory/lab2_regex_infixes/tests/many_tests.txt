@@ -1,0 +1,13 @@
+a
+a*
+ab
+ab*
+a|b
+a||b
+a|b*
+(a)
+(ab)
+abcd
+(ab)|(cd)
+(((ab(a(|ab*|)b))*)*)*
+(aba)*

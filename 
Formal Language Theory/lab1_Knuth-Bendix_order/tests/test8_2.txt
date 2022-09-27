@@ -1,7 +1,0 @@
-anti-lexicographic
-
-constructors = f(2),g(1)
-
-variables = x, y
-
-(f(g(x), g(y)) ::= f(x, y))

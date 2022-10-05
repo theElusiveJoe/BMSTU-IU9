@@ -14,6 +14,7 @@ if __name__ == '__main__':
     print('#base:', root)
 
     bfa = Brozozovsky_fa(root).build_complete_automata() 
+    print(bfa)
     Graph_creator('bronzovki_fa.dot', bfa.get_graph_edges()).write_to_file()
 
     result_regexps = set()
@@ -24,10 +25,11 @@ if __name__ == '__main__':
             # print(inf_r)
             result_regexps.add(inf_r.reverse())
 
-    result_regexps.remove(Symbol_node(''))
+    # result_regexps.remove(Symbol_node(''))
     res = list(result_regexps)
     res.sort(key=str)
     print('INFIXES:')
     for x in res:
         print('->>', x)
 
+    print(bfa.get_finals)

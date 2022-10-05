@@ -31,8 +31,16 @@ class Alternative_node(Regex_node):
             self.children_list
         ))
 
+        if len(self.children_list) > 2:
+            self.children_list = [self.children_list[0],
+                                  Alternative_node(self.children_list[1:])]
+        
+
     def __str__(self):
         return '﴾' + '|'.join(map(str, self.children_list)) + '﴿'
+
+    def __repr__(self):
+        return str(self)
 
     def nodes_str(self):
         return ', '.join(map(str, self.children_list))
@@ -71,6 +79,10 @@ class Alternative_node(Regex_node):
         # упорядочиваем
         self.children_list.sort(key=str)
 
+        # соблюдаем древовидную структуру
+        if len(self.children_list) > 2:
+            self.children_list = [self.children_list[0],
+                                  Alternative_node(self.children_list[1:])]
         return self
 
     def __eq__(self, o):
@@ -117,12 +129,13 @@ class Concat_node(Regex_node):
     def __str__(self):
         return ''.join(map(str, self.children_list))
 
+    def __repr__(self):
+        return str(self)
+
     def simplify(self):
-        # # print('simplify concat before', self.nodes_str())
         # упрощаем дочерние узлы
         for i in range(len(self.children_list)):
             self.children_list[i] = self.children_list[i].simplify()
-        # print('*********\nконкатенация:\n', self.nodes_str())
 
         # если в списке конкатенантов есть null, то вся конкатенация - null
         if any(map(lambda x: type(x).__name__ == 'Null_node', self.children_list)):
@@ -137,7 +150,7 @@ class Concat_node(Regex_node):
         # если есть хотя бы одна непустая строка, то выбрасываем все пустые
         self.children_list = list(filter(lambda x: type(
             x).__name__ != 'Symbol_node' or x.symbol != '', self.children_list))
-        # print('', self.nodes_str(), ' - профильтрвал')
+
         # если остался один
         if len(self.children_list) == 1:
             return self.children_list[0]
@@ -145,6 +158,19 @@ class Concat_node(Regex_node):
         if len(self.children_list) > 2:
             self.children_list = [self.children_list[0],
                                   Concat_node(self.children_list[1:])]
+
+        if type(self.children_list[0]).__name__ == 'Alternative_node':
+            return Alternative_node([
+                deepcopy(Concat_node([self.children_list[0].children_list[0], self.children_list[1]]).simplify()),
+                deepcopy(Concat_node([self.children_list[0].children_list[1], self.children_list[1]]).simplify()),
+            ]).simplify()
+        
+        if type(self.children_list[1]).__name__ == 'Alternative_node':
+            return Alternative_node([
+                deepcopy(Concat_node([self.children_list[0], self.children_list[1].children_list[0]]).simplify()),
+                deepcopy(Concat_node([self.children_list[0], self.children_list[1].children_list[1]]).simplify()),
+            ]).simplify()
+
         return self
 
     def __eq__(self, o):
@@ -158,8 +184,7 @@ class Concat_node(Regex_node):
         ret = Alternative_node([
             Concat_node([l.delta(), r.derivative(s)]),
             Concat_node([l.derivative(s), r])
-        ])
-
+        ]).simplify()
         return ret
 
     def delta(self):
@@ -183,6 +208,9 @@ class Concat_node(Regex_node):
 class Asterix_node(Regex_node):
     def __init__(self, children_list):
         Regex_node.__init__(self, children_list)
+
+    def __repr__(self):
+        return str(self)
 
     def __str__(self):
         return f'﴾{self.children_list[0]}﴿*'
@@ -221,6 +249,9 @@ class Asterix_node(Regex_node):
 class Symbol_node():
     def __init__(self, symbol):
         self.symbol = symbol
+
+    def __repr__(self):
+        return str(self)
 
     def __str__(self):
         if self.symbol == '':
@@ -265,6 +296,9 @@ class Null_node(Regex_node):
 
     def get_graph_edges(self):
         return []
+
+    def __repr__(self):
+        return str(self)
 
     def __str__(self):
         return 'null'

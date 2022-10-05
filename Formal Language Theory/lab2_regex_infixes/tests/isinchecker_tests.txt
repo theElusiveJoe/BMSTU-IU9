@@ -33,3 +33,6 @@ k*a* k*a 0
 b*aak* b*a*k* 1
 b*k* b*a*k* 1
 
+(abc)* (edf)* 0
+(aaa)* (edf)* 0
+(a)* (edf)* 0

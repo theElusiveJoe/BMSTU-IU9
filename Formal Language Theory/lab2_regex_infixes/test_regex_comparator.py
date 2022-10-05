@@ -18,11 +18,11 @@ if __name__ == '__main__':
         # lines.sort(key=len)
         tests = list([l.split()for l in filter(lambda x: len(x) > 0, lines)])
         for test in tests:
-            try:
-                assert bool(int(test[2])) == test_isinchecker(test[0], test[1])
-            except AssertionError as e:
-                print(bool(int(test[2])), test_isinchecker(test[0], test[1]))
+            # try:
+            assert bool(int(test[2])) == test_isinchecker(test[0], test[1])
+            # except AssertionError as e:
+            # print(bool(int(test[2])), test_isinchecker(test[0], test[1]))
 
-    # raw1 = 'a'
-    # raw2 = 'aaa'
+    # raw1 = 'ak*'
+    # raw2 = 'a*k*'
     # test_isinchecker(raw1, raw2)

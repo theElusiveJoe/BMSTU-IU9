@@ -1,12 +1,15 @@
 aa* a* 1
 a* aa* 0
+a* a* 1
 
 a a 1
 abcd abcd 1
 a aaa 0
 
+
 a* b* 0
 a*cc b*cc 0 
+cca* ccb* 0
 
 aa|bb aa|bb|cc|dd| 1
 a|kk* a*|k* 1
@@ -16,3 +19,17 @@ a|b* b*|aa 0
 
 | ab| 1
 | | 1
+
+
+aa*k* a*k* 1
+ak* a*k* 1
+aaak* a*k* 1
+aaak* aa*k* 1
+
+k*a k*a* 1
+k*aaaa k*aa*a 1
+k*a* k*a 0
+
+b*aak* b*a*k* 1
+b*k* b*a*k* 1
+

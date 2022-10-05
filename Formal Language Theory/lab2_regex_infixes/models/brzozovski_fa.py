@@ -1,5 +1,6 @@
 from tools.graph_creator import Graph_creator
 from copy import deepcopy
+from models.regex_parser import Regex_parser
 
 
 class Brozozovsky_fa():
@@ -8,10 +9,11 @@ class Brozozovsky_fa():
             filter(lambda x: x.isalpha() and x != 'ɛ', str(init_regex)))
 
         self.nodes = {init_regex}
-        self.start_node = init_regex
+        self.start_node = init_regex # Regex_parser(raw_text='start').parse().simplify()
         self.finish_nodes = set()
 
         self.edges = []
+        # self.edges = [(self.start_node, alpha, init_regex) for alpha in self.alphabeth]
         self.graph_edges_strings = []
 
     def __repr__(self):
@@ -82,9 +84,59 @@ class Brozozovsky_fa():
                 (filter(lambda x: x[2] == node, self.edges))
             )
         )
+    
+    def get_uncycled_node_input_alphabeth(self, node):
+        ret = set()
+        for x in self.get_node_input_alphabeth(node):
+            if (node, x, node) in self.edges:
+                continue
+            ret.add(x)
+        return ret
+
+    def get_cycled_node_input_alphabeth(self, node):
+        ret = set()
+        for x in self.get_node_input_alphabeth(node):
+            if (node, x, node) not in self.edges:
+                continue
+            ret.add(x)
+        return ret
+
+    def get_node_output_alphabeth(self, node):
+        return set(
+            map(
+                lambda x: x[1],
+                (filter(lambda x: x[0] == node, self.edges))
+            )
+        )
 
     def get_parent_nodes_by_alpha(self, node, alpha):
         return set(map(
             lambda x: x[0],
             filter(lambda x: x[1] == alpha and x[2] == node, self.edges)
         ))
+    
+    def get_child(self, node, alpha):
+        ret = False
+        for x in self.edges:
+            if x[0] == node and x[1] == alpha:
+                ret =  x[2]
+        
+        # print('| GET CHILD', node, alpha, ret)
+        # print('|', self.edges)
+
+        return ret
+
+    def is_cycled_by(self, node, alpha):
+        def loop(node, alpha, memory):
+            new_node = self.get_child(node, alpha)
+            if not new_node:
+                return False
+
+            if new_node in memory:
+                return True
+
+            memory.add(new_node)
+            return loop(node, alpha, memory)
+
+        res = loop(node, alpha, set())
+        return res

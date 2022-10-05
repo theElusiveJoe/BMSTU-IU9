@@ -14,13 +14,14 @@ class Is_in_checker():
         self.S1, self.S2 = self.b1.start_node, self.b2.start_node
         self.memory = set()
         self.edge_num = 1
-        
+
         Graph_creator('graph_re1.dot',
                       self.b1.get_graph_edges()).write_to_file()
         Graph_creator('graph_re2.dot',
                       self.b2.get_graph_edges()).write_to_file()
-        
-        print('L({0:<15s} L({1:<15s}'.format(str(r1)+')', str(r2)+')'), end='  <-  ')
+
+        print('L({0:<15s} L({1:<15s}'.format(
+            str(r1)+')', str(r2)+')'), end='  <-  ')
 
         self.f_num = 0
         self.edges_buffer = []
@@ -35,33 +36,42 @@ class Is_in_checker():
             else:
                 # print('no valid subgraph for final state', f1)
                 Graph_creator('f_subgraphs.dot',
-                            self.edges_buffer).write_to_file()
+                              self.edges_buffer).write_to_file()
                 return False
 
         Graph_creator('f_subgraphs.dot',
-                        self.edges_buffer).write_to_file()
+                      self.edges_buffer).write_to_file()
         return True
 
     def rec_foo(self, q1, q2):
         # print(self.f_num, '#### checking pair:', q1, q2)
-        alph1 = self.b1.get_node_input_alphabeth(q1)
-        alph2 = self.b2.get_node_input_alphabeth(q2)
         
-        if q1 == self.S1 and q2 != self.S2:
-            'path in secon automata is longer'
+        alph1_uncycled = self.b1.get_uncycled_node_input_alphabeth(q1)
+        alph1_cycled = self.b1.get_cycled_node_input_alphabeth(q1)
+        alph2 = self.b2.get_node_input_alphabeth(q2)
+        # print(f'{q1} is cycled by {alph1_cycled}')
+        # print(f'{q1} is uncycled by {alph1_uncycled}')
+        
+        if alph1_cycled:
+            for alpha in alph1_cycled:
+                if self.b2.is_cycled_by(q2, alpha):
+                    pass
+                else:
+                    return False
+
+        if not alph1_uncycled.issubset(alph2):
             return False
 
-        if q1 == self.S1 and q2 == self.S2 and alph1==alph2 and q1.delta != q2.delta:
+        if q1 == self.S1 and q2 != self.S2:
+            # print('path in second automata is longer')
+            return False
+
+        if q1 == self.S1 and q2 == self.S2:
             # print(self.f_num, 'they are both start')
             return True
 
-        # print(self.f_num, 'alphabeths:', alph1, alph2)
-        if not alph1.issubset(alph2):
-            # print(self.f_num, 'alphabeth false')
-            return False
-
         # print(self.f_num, 'now check for alphas')
-        for alpha in alph1:
+        for alpha in alph1_uncycled:
             # print(self.f_num, 'alpha =', alpha)
             Q1 = self.b1.get_parent_nodes_by_alpha(q1, alpha)
             Q2 = self.b2.get_parent_nodes_by_alpha(q2, alpha)
@@ -84,7 +94,7 @@ class Is_in_checker():
                             'parent': f'"{str(q2_p) + str(self.f_num)}"',
                             'parent_label': f'{str(q2_p)}',
                         })
-                        self.edge_num +=1
+                        self.edge_num += 1
 
                         if self.rec_foo(q1_p, q2_p):
                             break

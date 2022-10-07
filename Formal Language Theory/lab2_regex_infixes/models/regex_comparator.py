@@ -1,6 +1,6 @@
 from models.brzozovski_fa import Brozozovsky_fa
 from tools.graph_creator import Graph_creator
-
+from copy import deepcopy
 
 class Is_in_checker():
     def __init__(self):
@@ -20,8 +20,8 @@ class Is_in_checker():
         Graph_creator('graph_re2.dot',
                       self.b2.get_graph_edges()).write_to_file()
 
-        print('L({0:<15s} L({1:<15s}'.format(
-            str(r1)+')', str(r2)+')'), end='  <-  ')
+        # print('L({0:<15s} L({1:<15s}'.format(
+            # str(r1)+')', str(r2)+')'), end='  <-  \n')
 
         self.f_num = 0
         self.edges_buffer = []
@@ -103,3 +103,10 @@ class Is_in_checker():
                     return False
         # print('all paths matched:', q1, q2)
         return True
+
+    def filter_set(self, sett):
+        c_sett = deepcopy(sett)
+        for re in c_sett:
+            if any(map(lambda x: self.l1_in_l2(re, x) and not self.l1_in_l2(x, re), c_sett)):
+                sett.remove(re)
+        return sett

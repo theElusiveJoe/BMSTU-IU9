@@ -2,9 +2,9 @@ import sys
 from models.regex_node import Symbol_node
 from models.regex_parser import Regex_parser
 from models.brzozovski_fa import Brozozovsky_fa
+from models.regex_comparator import Is_in_checker
 from tools.graph_creator import Graph_creator
 from copy import deepcopy
-import re
 
 if __name__ == '__main__':
     p = Regex_parser(filepath = sys.argv[1])
@@ -26,10 +26,16 @@ if __name__ == '__main__':
             result_regexps.add(inf_r.reverse())
 
     # result_regexps.remove(Symbol_node(''))
+
     res = list(result_regexps)
     res.sort(key=str)
-    print('INFIXES:')
+    print('INFIXES WITH SUBREGS:')
+    for x in res:
+        print('->>', x)
+    
+    res = list(Is_in_checker().filter_set(result_regexps))
+    res.sort(key=str)
+    print('INFIXES FILTERED FALSE-POSITIVE BALLЫ ZHE NADO FARMITЬ:')
     for x in res:
         print('->>', x)
 
-    print(bfa.get_finals)

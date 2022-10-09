@@ -105,8 +105,15 @@ class Is_in_checker():
         return True
 
     def filter_set(self, sett):
-        c_sett = deepcopy(sett)
-        for re in c_sett:
-            if any(map(lambda x: self.l1_in_l2(re, x) and not self.l1_in_l2(x, re), c_sett)):
+        all_res = deepcopy(sett)
+        # for re in all_res:
+        #     for re2 in sett:
+        #         if re == re2:
+        #             pass
+        #         elif self.l1_in_l2(re, r2):
+        #             sett.remove(re)
+        #             break
+        for re in all_res:
+            if any(map(lambda x: self.l1_in_l2(re, x) and not x == re, sett)):
                 sett.remove(re)
         return sett

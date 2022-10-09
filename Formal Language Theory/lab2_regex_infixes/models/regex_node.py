@@ -159,17 +159,17 @@ class Concat_node(Regex_node):
             self.children_list = [self.children_list[0],
                                   Concat_node(self.children_list[1:])]
 
-        if type(self.children_list[0]).__name__ == 'Alternative_node':
-            return Alternative_node([
-                deepcopy(Concat_node([self.children_list[0].children_list[0], self.children_list[1]]).simplify()),
-                deepcopy(Concat_node([self.children_list[0].children_list[1], self.children_list[1]]).simplify()),
-            ]).simplify()
+        # if type(self.children_list[0]).__name__ == 'Alternative_node':
+        #     return Alternative_node([
+        #         deepcopy(Concat_node([self.children_list[0].children_list[0], self.children_list[1]]).simplify()),
+        #         deepcopy(Concat_node([self.children_list[0].children_list[1], self.children_list[1]]).simplify()),
+        #     ]).simplify()
         
-        if type(self.children_list[1]).__name__ == 'Alternative_node':
-            return Alternative_node([
-                deepcopy(Concat_node([self.children_list[0], self.children_list[1].children_list[0]]).simplify()),
-                deepcopy(Concat_node([self.children_list[0], self.children_list[1].children_list[1]]).simplify()),
-            ]).simplify()
+        # if type(self.children_list[1]).__name__ == 'Alternative_node':
+        #     return Alternative_node([
+        #         deepcopy(Concat_node([self.children_list[0], self.children_list[1].children_list[0]]).simplify()),
+        #         deepcopy(Concat_node([self.children_list[0], self.children_list[1].children_list[1]]).simplify()),
+        #     ]).simplify()
 
         return self
 

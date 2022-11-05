@@ -6,15 +6,18 @@ from models.regex_parser import Regex_parser
 class Brozozovsky_fa():
     def __init__(self, init_regex, graph_filepath='bronzovki_fa.dot'):
         self.alphabeth = set(
-            filter(lambda x: x.isalpha() and x != 'ɛ', str(init_regex)))
+            filter(lambda x: x.isalpha() and x != 'ɛ' or x == '$', str(init_regex)))
 
         self.nodes = {init_regex}
-        self.start_node = init_regex # Regex_parser(raw_text='start').parse().simplify()
+        # Regex_parser(raw_text='start').parse().simplify()
+        self.start_node = init_regex
         self.finish_nodes = set()
 
         self.edges = []
         # self.edges = [(self.start_node, alpha, init_regex) for alpha in self.alphabeth]
         self.graph_edges_strings = []
+
+        self.build_complete_automata()
 
     def __repr__(self):
         nl = '\n'
@@ -84,7 +87,7 @@ class Brozozovsky_fa():
                 (filter(lambda x: x[2] == node, self.edges))
             )
         )
-    
+
     def get_uncycled_node_input_alphabeth(self, node):
         ret = set()
         for x in self.get_node_input_alphabeth(node):
@@ -114,13 +117,13 @@ class Brozozovsky_fa():
             lambda x: x[0],
             filter(lambda x: x[1] == alpha and x[2] == node, self.edges)
         ))
-    
+
     def get_child(self, node, alpha):
         ret = False
         for x in self.edges:
             if x[0] == node and x[1] == alpha:
-                ret =  x[2]
-        
+                ret = x[2]
+
         # print('| GET CHILD', node, alpha, ret)
         # print('|', self.edges)
 

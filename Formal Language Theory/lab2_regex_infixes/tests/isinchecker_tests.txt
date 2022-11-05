@@ -36,3 +36,12 @@ b*k* b*a*k* 1
 (abc)* (edf)* 0
 (aaa)* (edf)* 0
 (a)* (edf)* 0
+
+(a(ab)a)*|(bbcd)* ((a(a)*ba)*|(bb)*|cd)* 1
+((a(a)*ba)*|(bb)*|cd)* (a(ab)a)*|(bbcd)* 0
+
+a* (aa)* 0
+(aa)* a* 1
+
+(aba)* (aa)* 0
+(abb)* (aab)* 0

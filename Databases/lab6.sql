@@ -3,7 +3,6 @@ go
 
 if DB_ID (N'lab6') is not null
 drop database lab6;
-go
 
 create database lab6
 on (
@@ -47,9 +46,9 @@ INSERT INTO Orders
     (order_id, creation_date, discount, payment_type, payment_status)
 VALUES
     ('Y-4567', CONVERT(date,N'10-25-2022'), 7, 'cache', 'not paid'),
-    ('Y-4875', CONVERT(date,N'10-25-2022'), 7, 'cache', 'not paid'),
-    ('Y-3578', CONVERT(date,N'10-25-2022'), 7, 'cache', 'not paid'),
-    ('Y-4613', CONVERT(date,N'10-25-2022'), 7, 'cache', 'not paid')
+    ('Y-4875', CONVERT(date,N'10-26-2022'), 7, 'cache', 'not paid'),
+    ('Y-3578', CONVERT(date,N'10-27-2022'), 7, 'cache', 'not paid'),
+    ('Y-4613', CONVERT(date,N'10-28-2022'), 7, 'cache', 'not paid')
 go
 
 SELECT COUNT(*)
@@ -170,9 +169,9 @@ go
 SELECT * from Clients
 go 
 
-DELETE FROM Servers
-WHERE server_num=1
-go
+-- DELETE FROM Servers
+-- WHERE server_num=1
+-- go
 
 SELECT * FROM Clients
 go

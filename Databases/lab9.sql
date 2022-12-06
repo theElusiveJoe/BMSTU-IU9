@@ -1,4 +1,4 @@
-wuse master;
+use master;
 go
 
 DROP DATABASE IF EXISTS lab9
@@ -132,50 +132,123 @@ GO
 -- представление.
 
 
-CREATE TRIGGER t4
-    ON OrdersView
-    INSTEAD OF UPDATE
-    AS 
-    BEGIN
-        PRINT 'helllol'
-        UPDATE OrdersView
-        SET status = 'was attemp to update by view'
-        WHERE order_id  in (SELECT order_id FROM inserted)
-    END 
-GO
-UPDATE OrdersView
-SET status = 'new'
-GO
-SELECT * from Orders
-GO 
+if OBJECT_ID(N'FK_Servers') is NOT NULL
+    ALTER TABLE Clients DROP CONSTRAINT FK_Servers
+if OBJECT_ID(N'Clients') is NOT NULL
+	DROP Table Clients;
+if OBJECT_ID(N'Servers') is NOT NULL
+	DROP Table Servers;
+DROP VIEW IF EXISTS cs_view 
+go
 
-CREATE TRIGGER t5
-    ON OrdersView
-    INSTEAD OF DELETE
-    AS 
-    BEGIN
-        PRINT 'MSG: "u are not allowed to delete via view"'
-    END 
-GO
-DELETE FROM OrdersView
-GO 
 
-CREATE TRIGGER t6
-    ON OrdersView
-    INSTEAD OF INSERT
-    AS 
-    BEGIN
-        INSERT INTO OrdersView
-        (order_id, creation_date, discount, payment_type, payment_status)
-        SELECT order_id, creation_date, discount, payment_type, payment_status FROM inserted WHERE discount > 5
-    END 
-GO
+CREATE TABLE Servers
+(
+    server_id int PRIMARY KEY NOT NULL,
+    os VARCHAR(100) NOT NULL,
+    ram NUMERIC NOT NULL,
+    cpu VARCHAR(100) NOT NULL
+)
 
-INSERT INTO OrdersView
-    (order_id, creation_date, discount, payment_type, payment_status)
+INSERT INTO Servers
+    (server_id, os, ram, cpu)
 VALUES
-    ('Y-11111', CONVERT(date,N'10-27-2022'), 7, 'cache', 'not paid'),
-    ('Y-22222', CONVERT(date,N'10-28-2022'), 0, 'cache', 'not paid')
-GO
-SELECT * from OrdersView
-GO 
+    (1, 'buboontu', 4.5, 'intel core i10100500k'),
+    (2, 'debibanan', 8, 'zeon3000')
+
+CREATE TABLE Clients
+(
+    user_id int PRIMARY KEY NOT NULL,
+    server_id int NOT NULL,
+    name VARCHAR(100) NOT NULL
+
+    CONSTRAINT FK_Servers UNIQUE FOREIGN KEY (server_id) REFERENCES Servers (server_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+
+INSERT INTO Clients
+    (user_id, server_id, name)
+VALUES
+    (111, 1, 'Vasya'),
+    (222, 2, 'Petya')
+go
+
+
+CREATE View cs_view AS
+    SELECT s.server_id as server_id, s.os as os, s.ram as ram, s.cpu as cpu, c.name as name, c.user_id as user_id
+    FROM Servers as s INNER JOIN Clients as c on s.server_id = c.server_id
+go
+
+SELECT * FROM cs_view
+go
+
+
+
+-- 1. INSERT TRIGGER
+CREATE TRIGGER t4 ON cs_view INSTEAD OF INSERT
+AS 
+    BEGIN 
+        IF (
+            ((SELECT COUNT(*) FROM inserted INNER JOIN Servers on Servers.server_id = inserted.server_id) > 0)
+            OR ((SELECT COUNT(*) FROM inserted INNER JOIN Clients on Clients.user_id = inserted.user_id) > 0))
+        RAISERROR('Such sever or user already exists', 18, 1)
+        ELSE
+        BEGIN
+            INSERT INTO Servers(server_id, os, ram, cpu)
+            SELECT server_id, os, ram, cpu FROM inserted
+
+            INSERT INTO Clients(name, user_id, server_id)
+            SELECT name, user_id, server_id FROM inserted
+        END
+    END
+go
+
+INSERT INTO cs_view(server_id, os, ram, cpu, name, user_id)
+VALUES (3, 'okoshki', 2, 'radeon', 'Sasha', 333)
+go
+
+INSERT INTO cs_view(server_id, os, ram, cpu, name, user_id)
+VALUES (3, 'fail insert', 2, 'fail insert', 'fail insert', 0)
+go
+INSERT INTO cs_view(server_id, os, ram, cpu, name, user_id)
+VALUES (34, 'fail insert', 2, 'fail insert', 'fail insert', 333)
+go
+
+SELECT * FROM cs_view
+go
+
+-- 2. UPDATE TRIGGER
+CREATE TRIGGER t5 ON cs_view INSTEAD OF UPDATE
+AS 
+BEGIN
+    IF UPDATE(server_id) RAISERROR('U cant update server id', 18, 1)
+    ELSE
+    BEGIN 
+        UPDATE Clients SET Clients.user_id = inserted.user_id, Clients.name = inserted.name FROM inserted WHERE inserted.user_id = Clients.user_id
+        UPDATE Servers SET Servers.os = inserted.os, Servers.ram = inserted.ram, Servers.cpu = inserted.cpu FROM inserted WHERE inserted.server_id = Servers.server_id
+    END
+END
+go 
+
+UPDATE cs_view set name = 'VASYA2' where server_id = 1
+UPDATE cs_view set ram = 1000 where user_id = 111
+go
+UPDATE cs_view set os = 'NEWOS2' where server_id = 1
+UPDATE cs_view set server_id = 222 where server_id = 2
+go
+
+SELECT * FROM cs_view
+go 
+
+-- 3. DELETE TRIGGER
+CREATE TRIGGER t6 ON cs_view INSTEAD OF DELETE
+AS 
+BEGIN
+    DELETE from Servers WHERE Servers.server_id in (SELECT server_id FROM deleted)
+END
+go 
+
+DELETE FROM cs_view WHERE server_id = 2
+SELECT * from cs_view
+SELECT * from Clients

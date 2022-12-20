@@ -27,36 +27,40 @@ def b():
     global s, r
     while True:
         lock.acquire()
+        time.sleep(0.1)
         lock2.acquire()
         if len(s) == 0:
             lock2.release()
+            time.sleep(0.1)
             lock.release()
             time.sleep(1)
             continue
         el, s = s[-1], s[:-1]
-
         print('B вытащил', el)
         r.append(el**2)
         lock2.release()
+        time.sleep(0.1)
         lock.release()
 
 
 def c():
     global s, r
     while True:
-        lock.acquire()
         lock2.acquire()
+        time.sleep(0.1)
+        lock.acquire()
         if len(s) == 0:
-            lock2.release()
             lock.release()
+            time.sleep(0.1)
+            lock2.release()
             time.sleep(1)
             continue
         el, s = s[-1], s[:-1]
-
         print('C вытащил', el)
         r.append(el**2)
-        lock2.release()
         lock.release()
+        time.sleep(0.1)
+        lock2.release()
 
 
 def d():

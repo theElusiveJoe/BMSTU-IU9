@@ -1,0 +1,9 @@
+main {
+    decl a;
+    decl b;
+    assign a 666;
+    assign b 777;
+    decl c;
+    assign c (+ (* a 2) b);
+    return c;
+}

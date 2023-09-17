@@ -1,0 +1,24 @@
+main {
+    lol (+ 0 0);
+    if (+ 1 0) {
+        lol (+ 1 1);
+        lol (+ 1 1);
+        if 3 {
+            lol (+ 3 3);
+        } else {
+            lol(+ 4 4);
+        }
+    } else {
+        lol(+ 2 2);
+        lol (+ 1 1);
+        if 3 {
+            lol (+ 3 3);
+        } else {
+            lol(+ 4 4);
+        }
+    }
+    lol (+ 0 0);
+    lol (+ 0 0);
+    lol (+ 0 0);
+    return 1;
+}

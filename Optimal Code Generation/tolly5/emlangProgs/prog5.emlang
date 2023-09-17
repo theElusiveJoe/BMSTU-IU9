@@ -1,0 +1,22 @@
+main {
+    decl a;
+    decl b;
+
+    assign a 111;
+
+    lol (+ 111111111 111111111);
+
+    assign a (+ 444 (+ 333 222 ));
+
+    lol (+ 111111111 111111111);
+
+    assign a b;
+
+    lol (+ 111111111 111111111);
+
+    assign a (+ 12345 b);
+    assign a (+ b 12345);
+    assign a (+ b b);
+
+    return 1;
+}

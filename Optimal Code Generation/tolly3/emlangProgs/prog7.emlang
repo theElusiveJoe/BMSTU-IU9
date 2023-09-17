@@ -1,0 +1,25 @@
+main {
+    decl a;
+    assign a 2000;
+    return 0;
+    while a {
+        assign a (- a 1);
+        while a {
+            assign a (- a 3);
+            if a {
+                assign a 333;
+            } else {
+                if a {
+                    assign a 555;
+                } else {
+                    
+                }
+                assign a 444;
+            }
+        }
+    }
+    decl b;
+    assign b a;
+
+    return b;
+}

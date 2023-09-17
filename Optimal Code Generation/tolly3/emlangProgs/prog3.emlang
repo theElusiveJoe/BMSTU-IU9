@@ -1,0 +1,21 @@
+main {
+    lol (+ 2 2);
+    if 1 {
+        lol (+ 1 1);
+    } else {
+        lol(+ 2 2);
+    }
+    lol (+ 0 0);
+    lol (+ 0 0);
+    lol (+ 0 0);
+    if 3 {
+        lol (+ 3 3);
+    } else {
+        lol(+ 4 4);
+        return 44444;
+    }
+    lol 0;
+
+
+    return 1;
+}

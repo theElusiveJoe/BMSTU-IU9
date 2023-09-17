@@ -1,0 +1,10 @@
+main {
+    decl b;
+    assign b 222;
+    if b {
+        assign b 333;
+    } else {
+        assign b 444;
+    }
+    return b;
+}
